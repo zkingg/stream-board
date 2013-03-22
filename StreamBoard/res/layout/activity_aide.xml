@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical" >
+	
+    <TextView
+        android:id="@+id/textView1"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center"
+        android:text="À propos: "
+        android:textAppearance="?android:attr/textAppearanceLarge" />
+	
+    <!--
+    <WebView  xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/webview"
+    android:layout_width="fill_parent"
+    android:layout_height="fill_parent"
+	/>
+    -->
+
+    <TextView
+        android:id="@+id/textView2"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text=" " />
+
+    <TextView
+        android:id="@+id/textView4"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="L’idée de ce projet repose sur un problème que tous les étudiants rencontres au quotidien dans les amphithéâtres, en effet la distance qui sépare le tableau du fond de la classe peut atteindre jusqu’à 15m c’est pourquoi nous avons eu cette idée que de récupérer dans un intervalle défini les images du tableau. " />
+
+    <TextView
+        android:id="@+id/textView3"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="L’application se décompose donc en plusieurs parties :
+        Application serveur
+ 		Application cliente pour smartphone/pc/mac
+ 		Un site web
+		" />
+
+    <ImageView
+        android:id="@+id/imageView1"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center"
+        android:src="@drawable/camera" />
+
+</LinearLayout>

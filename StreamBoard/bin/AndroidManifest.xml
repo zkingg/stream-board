@@ -1,0 +1,77 @@
+<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+    package="com.androidhive.sessions"
+    android:versionCode="1"
+    android:versionName="1.0" >
+
+    <uses-sdk
+        android:minSdkVersion="8"
+        android:targetSdkVersion="15" />
+    <uses-permission android:name="android.permission.INTERNET"/>
+    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE"/>
+    <uses-permission android:name="android.permission.GET_TASKS"/>
+    <uses-permission android:name="android.permission.WRITE_OWNER_DATA"/>
+<application
+        android:icon="@drawable/favicon"
+        android:label="@string/app_name"
+        android:theme="@style/AppTheme" android:description="@layout/activity_description">
+        
+         <!-- MainActivity -->
+        <activity
+            android:name=".MainActivity"
+            android:label="Streamboard" >
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+        </activity>
+        
+        
+        <!-- LoginActivity -->
+        <activity
+            android:name=".LoginActivity"
+            android:label="User Login" 
+           >
+        </activity>
+        
+         <!-- ImgActivity -->
+        <activity
+            android:name=".ImgActivity"
+            android:label="Img"
+           	android:screenOrientation="landscape" 
+       		android:configChanges="orientation|keyboardHidden" 
+             >
+        </activity>
+        
+        <!--  Aide -->
+        <activity
+            android:name=".AideActivity"
+            android:label="Aide" >
+        </activity>
+        
+        <!--  Web -->
+        <activity
+            android:name=".WebActivity"
+            android:label="Site Web" >
+        </activity>
+        
+        <!--  List -->
+        <activity
+            android:name=".ListCoursActivity"
+            android:label="Liste Cours" >
+        </activity>
+        
+        <!--  Cours List -->
+        <activity
+            android:name=".CourslistActivity"
+            android:label="Cours Image" >
+        </activity>
+        
+        <!--  Preference Activity -->
+        <activity
+            android:name=".Preference"
+            android:label="StreamBoard Preferences" >
+        </activity>
+        
+    </application>
+
+</manifest>

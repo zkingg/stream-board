@@ -1,0 +1,71 @@
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:padding="10dip"
+    >
+    
+    <!-- Name Label -->
+    <TextView
+        android:id="@+id/lblName"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:singleLine="true"
+        android:layout_marginTop="40dip"
+        android:layout_marginBottom="10dip"/>
+
+   	<!-- Email Label 
+    <TextView
+        android:id="@+id/lblEmail"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:singleLine="true"
+        android:layout_marginBottom="40dip"/>
+    -->
+     <!-- ***************************** -->
+     <!-- List -->
+      <Button
+        android:id="@+id/btnList"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Liste Cours" />
+      
+     <!-- Cours -->
+      <Button
+        android:id="@+id/btnCours"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Cours" />
+      
+      <!-- Aide-->
+      <Button
+        android:id="@+id/btnaide"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Aide" />
+      
+
+      <!-- Web  -->
+      <Button
+        android:id="@+id/btnweb"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text=" Site Streamboard" />
+     
+      
+    <!-- Logout-->
+      <Button
+          android:id="@+id/btnLogout"
+          android:layout_width="fill_parent"
+          android:layout_height="wrap_content"
+          android:text="Logout" />
+
+      <ImageView
+          android:id="@+id/imageView1"
+          android:layout_width="wrap_content"
+          android:layout_height="wrap_content"
+          android:layout_gravity="center"
+          android:src="@drawable/ingesup" />
+
+</LinearLayout>
