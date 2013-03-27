@@ -2,31 +2,21 @@ package core;
 
 import java.io.BufferedReader;
 import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.OutputStream;
 import java.io.PrintStream;
-import java.net.HttpURLConnection;
 import java.net.Socket;
 import java.net.SocketTimeoutException;
-import java.net.URL;
-import java.net.UnknownHostException;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.GregorianCalendar;
-import java.util.List;
-
 import android.app.Activity;
-import android.content.Context;
-import android.content.ContextWrapper;
 import android.content.SharedPreferences;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
-import android.os.Environment;
 import android.preference.PreferenceManager;
 import android.util.Log;
 
@@ -68,6 +58,8 @@ public class Communication{
 		SRV_ADDR = "10.10.162.110";
 	}*/
 	
+	public boolean isConneted(){return this.is_connected;}
+	
 	/*
 	 * @return id 
 	 */
@@ -76,7 +68,6 @@ public class Communication{
 			initSocket();
 			System.out.println("Requete de connection :"+login);
 			String str = ("login;"+login);
-			String rep = null;
 			envoi(str);
 			System.out.println("Attente de réponse");
 			String reponse = reception();				
@@ -99,7 +90,6 @@ public class Communication{
 			initSocket();
 			System.out.println("Demande de l'historique pour la salle:"+salle);
 			String str = ("getListDateRoom;"+salle);
-			String rep = null;
 			envoi(str);
 			System.out.println("Attente de réponse");
 			String reponse = reception();	
@@ -128,7 +118,6 @@ public class Communication{
 			initSocket();
 			System.out.println("Demande de la des fichiers image par salle et date ,pour la salle"+salle);
 			String str = ("getListDateImgRoom;"+salle+";"+date);
-			String rep = null;
 			envoi(str);
 			System.out.println("Attente de réponse");
 			String reponse = reception();	
@@ -199,7 +188,6 @@ public class Communication{
 			initSocket();
 			String str = "getListRoom";
 			System.out.println("Action:getListRoom");
-			String rep = null;
 			envoi(str);
 			System.out.println("Attente de réponse");
 			String reponse = reception();				
@@ -213,14 +201,15 @@ public class Communication{
 					list.add(salle);
 			}
 			
-			return list.size() != 0 ? list : null;//si no element return null 
+			return list;//si no element return null 
 		}
-		catch( NumberFormatException e ){return null;}
+		catch( NumberFormatException e ){}
 		catch(Exception e){
 			e.printStackTrace();
-			return null;
 		}
 		finally{closeSocket();}
+		
+		return list;
 	}
 	
 	private static Bitmap getBitmapFromURL(String src) {
@@ -272,6 +261,7 @@ public class Communication{
 		finally{closeSocket();}
 	}
 	
+	@SuppressWarnings("unused")
 	private void envoi(byte b[]){
 		try {
 			OutputStream o = s.getOutputStream();

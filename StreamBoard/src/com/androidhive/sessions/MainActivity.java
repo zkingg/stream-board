@@ -7,6 +7,8 @@ import android.content.Intent;
 import android.app.Activity;
 import android.os.Bundle;
 import android.text.Html;
+import android.view.Menu;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.widget.Button;
@@ -152,4 +154,23 @@ public void onClick(View v) {
 	        super.onRestart();
 	        session.checkLogin();
 	    }
+	 
+	 @Override
+		public boolean onCreateOptionsMenu(Menu menu) {
+			// TODO Auto-enerated method stub
+			menu.add(0,1,0,"Preference");
+			return true;
+		}
+		
+		@Override
+		public boolean onOptionsItemSelected(MenuItem item) {
+			// TODO Auto-generated method stub
+			switch(item.getItemId()){
+			case 1:
+				Intent i = new Intent(this,Preference.class);
+				startActivity(i);
+			break;
+			}
+			return true;
+		}
 }
