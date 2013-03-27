@@ -10,17 +10,15 @@ import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
-
 import thread.ToastExpander;
+import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.net.Uri;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Environment;
-import android.os.Handler;
-import android.os.Message;
-import android.text.Layout;
 import android.util.Log;
 import android.view.Gravity;
 import android.view.LayoutInflater;
@@ -44,11 +42,11 @@ public class ImgActivity extends Activity implements OnClickListener, OnItemSele
 	private String salle = "0";
 	private ImageView image = null;
 	private Toast toast;
-	private Handler handler;
 	private Spinner spinner;
 
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
+		
 		super.onCreate(savedInstanceState);
 		getWindow().setFlags(LayoutParams.FLAG_FULLSCREEN,LayoutParams.FLAG_FULLSCREEN);//full screen
 		requestWindowFeature(Window.FEATURE_NO_TITLE);//no titre
@@ -61,33 +59,17 @@ public class ImgActivity extends Activity implements OnClickListener, OnItemSele
 		findViewById(R.id.zone_boutons).setVisibility(View.GONE);
 		spinner.setOnItemSelectedListener(this);
 		
-		handler = new Handler(){
-			public void handleMessage(Message msg){
-				switch(msg.what){
-				case 0://thread init
-					alimenterSpinner(spinner);
-					salle = spinner.getItemAtPosition(spinner.getSelectedItemPosition()).toString();
-					refreshImg();
-				}
-			}
-		};
-		
-		/*alimenterSpinner(spinner);
-		
-		refreshImg();*/
-		new Thread(){public void run(){handler.sendMessage(handler.obtainMessage(0,""));}}.start();//lancer thread init
+		alimenterSpinner(spinner);
 	}
 	
 	@Override
 	public boolean onCreateOptionsMenu(Menu menu) {
-		// TODO Auto-enerated method stub
 		menu.add(0,1,0,"Preference");
 		return true;
 	}
 	
 	@Override
 	public boolean onOptionsItemSelected(MenuItem item) {
-		// TODO Auto-generated method stub
 		switch(item.getItemId()){
 		case 1:
 			Intent i = new Intent(this,Preference.class);
@@ -98,8 +80,31 @@ public class ImgActivity extends Activity implements OnClickListener, OnItemSele
 	}
 	
 	private void alimenterSpinner(Spinner s){
-		TThread t = new TThread(s);
-		runOnUiThread(t);
+		new AsyncTask<Void,Void,Void>()
+		{
+			private ArrayList<String> list;
+			
+			@SuppressWarnings({ "unchecked", "rawtypes" })
+			@Override
+			protected void onPostExecute(Void params) {
+				if(list != null && list.size() != 0)
+					spinner.setAdapter(new ArrayAdapter(ImgActivity.this,android.R.layout.simple_spinner_item,list));
+				else
+					spinner.setAdapter(new ArrayAdapter(ImgActivity.this,android.R.layout.simple_spinner_item,new Array[]{}));
+				
+				if(spinner.getCount() != 0)
+					salle = spinner.getItemAtPosition(spinner.getFirstVisiblePosition()).toString();
+							
+				refreshImg();
+			}
+			
+			@Override
+			protected Void doInBackground(Void... params) {
+				Communication c = new Communication(ImgActivity.this);
+				list = c.getListSalle();
+				return null;
+			}
+		}.execute();
 	}
 	
 	private void refreshImg(){
@@ -121,6 +126,7 @@ public class ImgActivity extends Activity implements OnClickListener, OnItemSele
 				stopLoadAnimation();
 			}
 		}.start();
+	
 	}
 	
 	@Override
@@ -145,6 +151,7 @@ public class ImgActivity extends Activity implements OnClickListener, OnItemSele
 		}
 	}
 
+	@SuppressLint("SimpleDateFormat")
 	private void sauvegarderImg(){
 		File file = new File(this.getCacheDir().getAbsolutePath()+"/now.png");
 		if(! file.isFile()){
@@ -185,6 +192,7 @@ public class ImgActivity extends Activity implements OnClickListener, OnItemSele
 		}
 	}
 	
+	@SuppressLint("ShowToast")
 	public void startLoadAnimation(){
 		toast = Toast.makeText(getApplicationContext(),R.string.app_name, Toast.LENGTH_SHORT);
 		LayoutInflater inflater = getLayoutInflater();
@@ -226,20 +234,6 @@ public class ImgActivity extends Activity implements OnClickListener, OnItemSele
 		}
 	}
 	
-	public class TThread extends Thread{
-		private Spinner s;
-		public TThread(Spinner s){this.s = s;}
-		public void run(){
-			Communication c = new Communication(ImgActivity.this);
-			ArrayList<String> list = c.getListSalle();
-
-			if(list != null && list.size() != 0)
-				s.setAdapter(new ArrayAdapter(ImgActivity.this,android.R.layout.simple_spinner_item,list));
-			else
-				s.setAdapter(new ArrayAdapter(ImgActivity.this,android.R.layout.simple_spinner_item,new Array[]{}));
-		}
-	}
-
 	@Override
 	public void onItemSelected(AdapterView<?> parent, View arg1, int pos,long arg3) {
 		salle = parent.getItemAtPosition(pos).toString();
@@ -254,9 +248,6 @@ public class ImgActivity extends Activity implements OnClickListener, OnItemSele
 	
 	@Override
 	protected void onResume() {
-		// TODO Auto-generated method stub
 		super.onResume();
-		Spinner spinner = (Spinner)findViewById(R.id.spinner1);
-		alimenterSpinner(spinner);
 	}
 }
