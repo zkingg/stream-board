@@ -41,7 +41,10 @@ public class CourslistActivity extends ListActivity{
 			
 			@Override
 			protected void onPostExecute(Void result) {
-				 setListAdapter(new ArrayAdapter<String>(CourslistActivity.this, android.R.layout.simple_list_item_1,list));
+				if(list.size() == 0)
+					Toast.makeText(CourslistActivity.this, "Impossible d'afficher la liste des salles",Toast.LENGTH_LONG).show();
+				else
+					setListAdapter(new ArrayAdapter<String>(CourslistActivity.this, android.R.layout.simple_list_item_1,list));
 			}
 			 
 			@Override
