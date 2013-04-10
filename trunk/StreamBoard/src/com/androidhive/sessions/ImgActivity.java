@@ -37,6 +37,7 @@ import android.widget.ImageView;
 import android.widget.Spinner;
 import android.widget.Toast;
 import core.Communication;
+import core.ImpossibleConnectionException;
 
 public class ImgActivity extends Activity implements OnClickListener, OnItemSelectedListener {
 	private String salle = "0";
@@ -80,7 +81,7 @@ public class ImgActivity extends Activity implements OnClickListener, OnItemSele
 	}
 	
 	private void alimenterSpinner(Spinner s){
-		new AsyncTask<Void,Void,Void>()
+		new AsyncTask<Void,Integer,Void>()
 		{
 			private ArrayList<String> list;
 			
@@ -101,14 +102,22 @@ public class ImgActivity extends Activity implements OnClickListener, OnItemSele
 			@Override
 			protected Void doInBackground(Void... params) {
 				Communication c = new Communication(ImgActivity.this);
-				list = c.getListSalle();
+				try {list = c.getListSalle();}
+				catch (ImpossibleConnectionException e) {publishProgress(-1);}
+				
 				return null;
+			}
+			
+			protected  void onProgressUpdate(Integer[] values) {
+				if(values[0] == -1){
+					Toast.makeText(ImgActivity.this,"Connection impossible", Toast.LENGTH_LONG).show();
+				}
 			}
 		}.execute();
 	}
 	
 	private void refreshImg(){
-		startLoadAnimation();
+		/*startLoadAnimation();
 		new Thread() {
 			private Bitmap img;
 			public void run(){
@@ -125,8 +134,46 @@ public class ImgActivity extends Activity implements OnClickListener, OnItemSele
 				});
 				stopLoadAnimation();
 			}
-		}.start();
-	
+		}.start();*/
+		
+		new AsyncTask<Void, Integer, Void>(){
+			private Bitmap img;
+			
+			@Override
+			protected Void doInBackground(Void... params) {
+				Communication c = new Communication(ImgActivity.this);
+				c.setAppDir(ImgActivity.this.getCacheDir().getAbsolutePath());	
+				try{img = c.getInstantImg(salle);}
+				catch(ImpossibleConnectionException e){
+					publishProgress(-1);
+				}
+				
+				publishProgress(1);
+				return null;
+			}
+			
+			@Override
+			protected void onProgressUpdate(Integer... values) {
+				if(values[0] ==-1)//si echec connection
+					Toast.makeText(ImgActivity.this,"Connection impossible", Toast.LENGTH_LONG).show();
+				else{
+					if(img == null)
+						Toast.makeText(ImgActivity.this,"Connection impossible", Toast.LENGTH_LONG).show();
+					else
+						image.setImageBitmap(img);
+				}
+			}
+			
+			@Override
+			protected void onPreExecute() {
+				startLoadAnimation();
+			}
+			
+			@Override
+			protected void onPostExecute(Void result) {
+				stopLoadAnimation();
+			}
+		}.execute();
 	}
 	
 	@Override
