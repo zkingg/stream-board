@@ -1,5 +1,6 @@
 package com.androidhive.sessions;
 import core.Communication;
+import core.ImpossibleConnectionException;
 
 import android.app.Activity;
 import android.os.AsyncTask;
@@ -32,7 +33,10 @@ public class ListCoursActivity extends ListActivity{
 				 
 				 @Override
 				 protected void onPostExecute(Void result) {
-					setListAdapter(new ArrayAdapter<String>(ListCoursActivity.this, android.R.layout.simple_list_item_1,list));
+					if(list.size() == 0)
+						Toast.makeText(ListCoursActivity.this, "Impossible d'afficher la liste des salles",Toast.LENGTH_LONG).show();
+					else
+						setListAdapter(new ArrayAdapter<String>(ListCoursActivity.this, android.R.layout.simple_list_item_1,list));
 				 }
 				 
 				@Override
@@ -42,13 +46,17 @@ public class ListCoursActivity extends ListActivity{
 						c= new Communication(ListCoursActivity.this);	 
 						list = c.getListSalle();
 						
+					}catch(ImpossibleConnectionException e){
+						publishProgress(-1);
 					}catch(Exception e){
-						publishProgress(1);
+						publishProgress(-1);
+						e.printStackTrace();
 					}
 					return null;
 				}
 				
 				protected void onProgressUpdate(Integer... values) {
+					Log.e("","aa");
 					Toast.makeText(ListCoursActivity.this, "Connection Impossible",Toast.LENGTH_LONG).show();
 
 				}
