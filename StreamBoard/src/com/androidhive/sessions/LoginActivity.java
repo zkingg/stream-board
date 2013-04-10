@@ -15,6 +15,7 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.Toast;
 import core.Communication;
+import core.ImpossibleConnectionException;
 
 public class LoginActivity extends Activity {
 	private ProgressDialog progress = null;
@@ -53,8 +54,11 @@ public class LoginActivity extends Activity {
 						if(username.trim().length() > 0 ){
 							Communication com = new Communication(LoginActivity.this);
 							long id_user = 0;
-	
-							if((id_user = com.login(username)) > 0){
+							
+							try {id_user = com.login(username);}
+							catch (ImpossibleConnectionException e) {id_user = -10;}
+							
+							if((id_user) > 0){
 								stopLoadAnimation();
 								//session.createLoginSession(username, "");
 								session.createLoginSession(username);

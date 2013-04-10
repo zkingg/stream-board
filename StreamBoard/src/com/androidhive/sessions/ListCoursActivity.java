@@ -2,6 +2,7 @@ package com.androidhive.sessions;
 import core.Communication;
 
 import android.app.Activity;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.app.ListActivity;
 import android.content.Intent;
@@ -25,18 +26,36 @@ public class ListCoursActivity extends ListActivity{
 	    public void onCreate(Bundle savedInstanceState) {
 			super.onCreate(savedInstanceState);
 			 setContentView(R.layout.activity_list);
-			 c= new Communication(ListCoursActivity.this);
+			 list = new ArrayList<String>();
 			 
-			 //lvListe = (ListView)findViewById(R.layout.activity_list); 
-			 //String[] listeStrings = {"Cours1","Cours2","Cours3"};	 
-			  list = new ArrayList<String>();
-			 list = c.getListSalle();
+			 new AsyncTask<Void, Integer, Void>() {
+				 
+				 @Override
+				 protected void onPostExecute(Void result) {
+					setListAdapter(new ArrayAdapter<String>(ListCoursActivity.this, android.R.layout.simple_list_item_1,list));
+				 }
+				 
+				@Override
+				protected Void doInBackground(Void... params) {
+					// TODO Auto-generated method stub
+					try{
+						c= new Communication(ListCoursActivity.this);	 
+						list = c.getListSalle();
+						
+					}catch(Exception e){
+						publishProgress(1);
+					}
+					return null;
+				}
+				
+				protected void onProgressUpdate(Integer... values) {
+					Toast.makeText(ListCoursActivity.this, "Connection Impossible",Toast.LENGTH_LONG).show();
+
+				}
+			}.execute();
 			 
 			 System.out.println(list.toString() + " " );    
 			    
-			 
-			 setListAdapter(new ArrayAdapter<String>(this, android.R.layout.simple_list_item_1,list));
-			 
 			 //lvListe.onListItemClick(this);
 			 
 		}
@@ -67,10 +86,6 @@ public class ListCoursActivity extends ListActivity{
 				}
 			});
 			*/
-		
-
-		
-		
 	
 }
 

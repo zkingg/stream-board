@@ -63,7 +63,7 @@ public class Communication{
 	/*
 	 * @return id 
 	 */
-	public int login(String login){
+	public int login(String login) throws ImpossibleConnectionException{
 		try {
 			initSocket();
 			System.out.println("Requete de connection :"+login);
@@ -84,7 +84,7 @@ public class Communication{
 		finally{closeSocket();}
 	}
 	
-	public ArrayList<String> getListDateSalle(String salle){
+	public ArrayList<String> getListDateSalle(String salle) throws ImpossibleConnectionException{
 		ArrayList<String> list = new ArrayList<String>();
 		try {
 			initSocket();
@@ -112,7 +112,7 @@ public class Communication{
 		return list;
 	}
 	
-	public ArrayList<String> getListDateImgRoom(String salle,String date){
+	public ArrayList<String> getListDateImgRoom(String salle,String date) throws ImpossibleConnectionException{
 		ArrayList<String> list = new ArrayList<String>();
 		try {
 			initSocket();
@@ -140,7 +140,7 @@ public class Communication{
 		return list;
 	}
 	
-	public Bitmap getImgFromHistory(String salle,String date,String fichier){
+	public Bitmap getImgFromHistory(String salle,String date,String fichier) throws ImpossibleConnectionException{
 		try {
 			Bitmap img = null;
 			initSocket();
@@ -182,7 +182,7 @@ public class Communication{
 		finally{closeSocket();}
 	}
 	
-	public ArrayList<String> getListSalle(){
+	public ArrayList<String> getListSalle() throws ImpossibleConnectionException{
 		ArrayList<String> list = new ArrayList<String>();
 		try {
 			initSocket();
@@ -222,7 +222,7 @@ public class Communication{
 	    }
 	}
 	
-	public Bitmap getInstantImg(String salle){
+	public Bitmap getInstantImg(String salle)throws ImpossibleConnectionException{
 		try {
 			Bitmap img = null;
 			initSocket();
@@ -306,7 +306,7 @@ public class Communication{
 			catch (InterruptedException e) {}
 			Calendar now = new GregorianCalendar();
 			if((now.getTimeInMillis() - debut.getTimeInMillis()) > TIME_MAX_ALLOWED){
-				throw new Exception("Connection Impossible ...");
+				throw new ImpossibleConnectionException("Connection Impossible ...");
 			}			
 		}
 	}
