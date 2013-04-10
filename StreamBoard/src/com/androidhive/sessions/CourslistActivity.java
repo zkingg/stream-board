@@ -14,6 +14,7 @@ import android.app.ListActivity;
 import android.content.Intent;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.Gravity;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -35,7 +36,7 @@ public class CourslistActivity extends ListActivity{
 	//
 	@Override
     public void onCreate(Bundle savedInstanceState) {
-		super.onCreate(savedInstanceState);
+		 super.onCreate(savedInstanceState);
 		 setContentView(R.layout.activity_courslist);
 		 list = new ArrayList<String>();
 		
@@ -44,7 +45,7 @@ public class CourslistActivity extends ListActivity{
 			@Override
 			protected void onPostExecute(Void result) {
 				if(list.size() == 0)
-					Toast.makeText(CourslistActivity.this, "Impossible d'afficher la liste des salles",Toast.LENGTH_LONG).show();
+					Toast.makeText(CourslistActivity.this, "Impossible d'afficher la liste des dates",Toast.LENGTH_LONG).show();
 				else
 					setListAdapter(new ArrayAdapter<String>(CourslistActivity.this, android.R.layout.simple_list_item_1,list));
 			}
@@ -69,16 +70,20 @@ public class CourslistActivity extends ListActivity{
 		
 		 System.out.println(list.toString() + " " );
 		 
+		 
 	}
 	
 
 	protected void onListItemClick(ListView l, View v, int position, long id) {
         
-         // Intent launcher here
-//		Intent intent5 = new Intent(this,CourslistActivity.class);
-//		intent5.putExtra("list",list.get(position));
-//		this.startActivityForResult(intent5, 1000);	
-		//startActivity(intent5); 
+		Log.e("","position : "+position);
+        // Intent launcher here
+		Intent intent7 = new Intent(this,HistActivity.class);
+		String l1 = list.get(position);
+		Log.e("","l : "+l1);
+		intent7.putExtra("list",l1);
+	
+		this.startActivityForResult(intent7, 1000);	
     }
 
 	 @Override

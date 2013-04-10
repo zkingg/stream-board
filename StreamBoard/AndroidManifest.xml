@@ -72,6 +72,12 @@
             android:label="StreamBoard Preferences" >
         </activity>
         
+        <!--  Hist Activity -->
+        <activity
+            android:name=".HistActivity"
+            android:label="Hist img" >
+        </activity>
+        
     </application>
 
 </manifest>
