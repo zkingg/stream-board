@@ -1,0 +1,6 @@
+MySQL:
+ Host: sublicraft.org
+ Port: 3306
+ Login: root
+ Password: dadada
+ Database: streamboard
