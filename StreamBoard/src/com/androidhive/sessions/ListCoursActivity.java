@@ -8,6 +8,8 @@ import android.os.Bundle;
 import android.app.ListActivity;
 import android.content.Intent;
 import android.util.Log;
+import android.view.Menu;
+import android.view.MenuItem;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
@@ -80,6 +82,25 @@ public class ListCoursActivity extends ListActivity{
 			this.startActivityForResult(intent5, 1000);	
 			
 	    }
+		
+		 @Override
+			public boolean onCreateOptionsMenu(Menu menu) {
+				// TODO Auto-enerated method stub
+				menu.add(0,1,0,"Preference");
+				return true;
+			}
+			
+		@Override
+			public boolean onOptionsItemSelected(MenuItem item) {
+				// TODO Auto-generated method stub
+				switch(item.getItemId()){
+				case 1:
+					Intent i = new Intent(this,Preference.class);
+					startActivity(i);
+				break;
+				}
+				return true;
+			}
 			 
 			 /*
 			ListView listView = getListView();
