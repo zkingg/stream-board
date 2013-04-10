@@ -15,6 +15,8 @@ import android.content.Intent;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.view.Gravity;
+import android.view.Menu;
+import android.view.MenuItem;
 import android.view.View;
 import android.widget.ArrayAdapter;
 import android.widget.ListView;
@@ -79,6 +81,23 @@ public class CourslistActivity extends ListActivity{
 		//startActivity(intent5); 
     }
 
-	
+	 @Override
+		public boolean onCreateOptionsMenu(Menu menu) {
+			// TODO Auto-enerated method stub
+			menu.add(0,1,0,"Preference");
+			return true;
+		}
+		
+	@Override
+		public boolean onOptionsItemSelected(MenuItem item) {
+			// TODO Auto-generated method stub
+			switch(item.getItemId()){
+			case 1:
+				Intent i = new Intent(this,Preference.class);
+				startActivity(i);
+			break;
+			}
+			return true;
+		}
 	
 }
