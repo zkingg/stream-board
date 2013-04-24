@@ -5,9 +5,12 @@ import core.Communication;
 import core.ImpossibleConnectionException;
 import android.app.Activity;
 import android.app.ListActivity;
+import android.content.Intent;
 import android.graphics.Bitmap;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.util.Log;
+import android.view.View;
 import android.widget.ArrayAdapter;
 import android.widget.ListView;
 import android.widget.Toast;
@@ -18,7 +21,8 @@ public class HistActivity extends ListActivity {
 	ListView lvListe;
 	Communication c ;
 	ArrayList<String> list;
-	
+	String room_name;
+	String date;
 	Bitmap img;
 	
 	@Override
@@ -42,8 +46,9 @@ public class HistActivity extends ListActivity {
 			protected Void doInBackground(Void... params) {
 				c= new Communication(HistActivity.this);
 				try {
-					// A modifier !!! 
-					//list = c.getListDateImgRoom(HistActivity.this.getIntent().getExtras().getString("list"));
+					room_name = HistActivity.this.getIntent().getExtras().getString("room_name");
+					date = HistActivity.this.getIntent().getExtras().getString("list");
+					list = c.getListDateImgRoom(room_name, date);
 					
 				} catch (ImpossibleConnectionException e) {
 					publishProgress(-1);
@@ -62,6 +67,13 @@ public class HistActivity extends ListActivity {
 		  
 	}
 	
-	
-	
+	protected void onListItemClick(ListView l, View v, int position, long id) {
+		Intent intent_galerie = new Intent(this,GalerieActivity.class);
+		String img_name = list.get(position);
+		intent_galerie.putExtra("img_name", img_name);
+		intent_galerie.putExtra("room_name", room_name);
+		intent_galerie.putExtra("date", date);
+		
+		this.startActivity(intent_galerie);	
+    }
 }

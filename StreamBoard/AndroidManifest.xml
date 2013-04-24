@@ -77,6 +77,12 @@
             android:name=".HistActivity"
             android:label="Hist img" >
         </activity>
+                
+        <!--  Galerie Activity -->
+        <activity
+            android:name=".GalerieActivity"
+            android:label="Galerie" >
+        </activity>
         
     </application>
 
