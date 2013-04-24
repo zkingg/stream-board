@@ -32,6 +32,7 @@ public class CourslistActivity extends ListActivity{
 	ListView lvListe;
 	Communication c ;
 	ArrayList<String> list;
+	String room_name;
 	
 	//
 	@Override
@@ -54,7 +55,8 @@ public class CourslistActivity extends ListActivity{
 			protected Void doInBackground(Void... params) {
 				c= new Communication(CourslistActivity.this);
 				try {
-					list = c.getListDateSalle(CourslistActivity.this.getIntent().getExtras().getString("list"));
+					room_name = CourslistActivity.this.getIntent().getExtras().getString("list");
+					list = c.getListDateSalle(room_name);
 				} catch (ImpossibleConnectionException e) {
 					publishProgress(-1);
 				}
@@ -73,7 +75,7 @@ public class CourslistActivity extends ListActivity{
 		 
 	}
 	
-
+	@Override
 	protected void onListItemClick(ListView l, View v, int position, long id) {
         
 		Log.e("","position : "+position);
@@ -82,7 +84,8 @@ public class CourslistActivity extends ListActivity{
 		String l1 = list.get(position);
 		Log.e("","l : "+l1);
 		intent7.putExtra("list",l1);
-	
+		intent7.putExtra("room_name", room_name);
+		
 		this.startActivityForResult(intent7, 1000);	
     }
 

@@ -80,7 +80,6 @@ public class ListCoursActivity extends ListActivity{
 			intent5.putExtra("list",l1);
 			
 			this.startActivityForResult(intent5, 1000);	
-			
 	    }
 		
 		 @Override
