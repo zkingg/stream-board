@@ -15,17 +15,25 @@ import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.content.Intent;
 import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
+import android.graphics.Matrix;
+import android.graphics.PointF;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Environment;
+import android.util.FloatMath;
 import android.util.Log;
 import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.MotionEvent;
+import android.view.SubMenu;
 import android.view.View;
 import android.view.View.OnClickListener;
+import android.view.View.OnLongClickListener;
+import android.view.View.OnTouchListener;
 import android.view.ViewGroup;
 import android.view.Window;
 import android.view.WindowManager.LayoutParams;
@@ -34,37 +42,63 @@ import android.widget.AdapterView;
 import android.widget.AdapterView.OnItemSelectedListener;
 import android.widget.ArrayAdapter;
 import android.widget.ImageView;
+import android.widget.ProgressBar;
+import android.widget.SeekBar;
+import android.widget.SeekBar.OnSeekBarChangeListener;
 import android.widget.Spinner;
+import android.widget.TextView;
 import android.widget.Toast;
 import core.Communication;
 import core.ImpossibleConnectionException;
 
-public class ImgActivity extends Activity implements OnClickListener, OnItemSelectedListener {
+public class ImgActivity extends Activity implements  OnTouchListener {
 	private String salle = "0";
+	private ArrayList<String> salles;
+	private boolean refresh_needed=false;
 	private ImageView image = null;
 	private Toast toast;
-	private Spinner spinner;
+	private TextView texte_salle;
+	
+	// These matrices will be used to move and zoom image
+	Matrix matrix = new Matrix();
+	Matrix savedMatrix = new Matrix();
+
+	// We can be in one of these 3 states
+	static final int NONE = 0;
+	static final int DRAG = 1;
+	static final int ZOOM = 2;
+	int mode = NONE;
+
+	// Remember some things for zooming
+	PointF start = new PointF();
+	PointF mid = new PointF();
+	float oldDist = 1f;
+	String savedItemClicked;
 
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
-		
 		super.onCreate(savedInstanceState);
 		getWindow().setFlags(LayoutParams.FLAG_FULLSCREEN,LayoutParams.FLAG_FULLSCREEN);//full screen
 		requestWindowFeature(Window.FEATURE_NO_TITLE);//no titre
 		setContentView(R.layout.activity_img);
 		image = (ImageView) findViewById(R.id.ivImage);
-		findViewById(R.id.btn_refresh).setOnClickListener(this);
-		findViewById(R.id.btn_sav).setOnClickListener(this);
-		findViewById(R.id.ivImage).setOnClickListener(this);
-		spinner = (Spinner)findViewById(R.id.spinner1);
-		findViewById(R.id.zone_boutons).setVisibility(View.GONE);
-		spinner.setOnItemSelectedListener(this);
+		image.setOnTouchListener(this);
+		texte_salle = (TextView) findViewById(R.id.salle);
 		
-		alimenterSpinner(spinner);
+		getListeSalles();
 	}
 	
 	@Override
-	public boolean onCreateOptionsMenu(Menu menu) {
+	public boolean onPrepareOptionsMenu(Menu menu) {
+		menu.clear();
+		SubMenu s = menu.addSubMenu(0,10,0,"Changer de salle");
+		System.out.println(salles);
+		for(String salle : salles){
+			s.add(salle);
+		}
+		
+		menu.add(0,2,0,"Rafraichir");
+		menu.add(0,3,0,"Sauvegarder");
 		menu.add(0,1,0,"Preference");
 		return true;
 	}
@@ -72,42 +106,61 @@ public class ImgActivity extends Activity implements OnClickListener, OnItemSele
 	@Override
 	public boolean onOptionsItemSelected(MenuItem item) {
 		switch(item.getItemId()){
-		case 1:
+		case 1://preferences
+			refresh_needed = true;
 			Intent i = new Intent(this,Preference.class);
 			startActivity(i);
-		break;
+			break;
+		case 2://rafraichir
+			refreshImg();
+			break;
+		case 3://sauvegarder
+			sauvegarderImg();
+			break;
+		case 10://changer salle
+			if(salles==null || salles.size()==0)
+				Toast.makeText(this, "Imposssible de récuperer les salles ...", Toast.LENGTH_SHORT).show();
+			break;
+		default:
+			//Log.i("",""+item.getTitle());
+			if(salles.contains(""+item.getTitle())){//si option est une salle
+				this.salle = ""+item.getTitle();
+				texte_salle.setText(item.getTitle());
+				refreshImg();
+			}
+			break;
 		}
 		return true;
 	}
 	
-	private void alimenterSpinner(Spinner s){
+	private void getListeSalles(){
 		new AsyncTask<Void,Integer,Void>()
 		{
-			private ArrayList<String> list;
+			@Override
+			protected void onPreExecute() {
+				startLoadAnimation();
+			}
 			
-			@SuppressWarnings({ "unchecked", "rawtypes" })
 			@Override
 			protected void onPostExecute(Void params) {
-				if(list != null && list.size() != 0)
-					spinner.setAdapter(new ArrayAdapter(ImgActivity.this,android.R.layout.simple_spinner_item,list));
-				else
-					spinner.setAdapter(new ArrayAdapter(ImgActivity.this,android.R.layout.simple_spinner_item,new Array[]{}));
-				
-				if(spinner.getCount() != 0)
-					salle = spinner.getItemAtPosition(spinner.getFirstVisiblePosition()).toString();
-							
-				refreshImg();
+				stopLoadAnimation();
+				if(salles != null && salles.size() != 0){
+					salle = salles.get(0);
+					texte_salle.setText(salle);
+					refreshImg();
+				}
 			}
 			
 			@Override
 			protected Void doInBackground(Void... params) {
 				Communication c = new Communication(ImgActivity.this);
-				try {list = c.getListSalle();}
+				try {ImgActivity.this.salles = c.getListSalle();}
 				catch (ImpossibleConnectionException e) {publishProgress(-1);}
 				
 				return null;
 			}
 			
+			@Override
 			protected  void onProgressUpdate(Integer[] values) {
 				if(values[0] == -1){
 					Toast.makeText(ImgActivity.this,"Connection impossible", Toast.LENGTH_LONG).show();
@@ -117,25 +170,6 @@ public class ImgActivity extends Activity implements OnClickListener, OnItemSele
 	}
 	
 	private void refreshImg(){
-		/*startLoadAnimation();
-		new Thread() {
-			private Bitmap img;
-			public void run(){
-				Communication c = new Communication(ImgActivity.this);
-				c.setAppDir(ImgActivity.this.getCacheDir().getAbsolutePath());		
-				img = c.getInstantImg(salle);
-				runOnUiThread(new Thread() {
-					public void run(){
-						if(img == null)
-							Toast.makeText(ImgActivity.this,"Connection impossible", Toast.LENGTH_LONG).show();
-						else
-							image.setImageBitmap(img);
-					}
-				});
-				stopLoadAnimation();
-			}
-		}.start();*/
-		
 		new AsyncTask<Void, Integer, Void>(){
 			private Bitmap img;
 			
@@ -174,28 +208,6 @@ public class ImgActivity extends Activity implements OnClickListener, OnItemSele
 				stopLoadAnimation();
 			}
 		}.execute();
-	}
-	
-	@Override
-	public void onClick(View arg0) {
-		switch (arg0.getId()) {
-		case R.id.btn_refresh:
-			refreshImg();
-		break;
-		case R.id.btn_sav:			
-			sauvegarderImg();
-		break;
-		case R.id.ivImage:
-			View v = findViewById(R.id.zone_boutons);
-			if(v.getVisibility() == View.GONE){
-				v.setVisibility(View.VISIBLE);
-				v.startAnimation(AnimationUtils.loadAnimation(this,android.R.anim.fade_in));
-			}else{
-				v.startAnimation(AnimationUtils.loadAnimation(this,android.R.anim.fade_out));
-				v.setVisibility(View.GONE);
-			}
-			break;
-		}
 	}
 
 	@SuppressLint("SimpleDateFormat")
@@ -241,20 +253,11 @@ public class ImgActivity extends Activity implements OnClickListener, OnItemSele
 	
 	@SuppressLint("ShowToast")
 	public void startLoadAnimation(){
-		toast = Toast.makeText(getApplicationContext(),R.string.app_name, Toast.LENGTH_SHORT);
-		LayoutInflater inflater = getLayoutInflater();
-		View new_view = inflater.inflate(R.layout.load_layout,(ViewGroup)findViewById(R.id.loadlayout));
-		toast.setView(new_view);
-		toast.setGravity(Gravity.CENTER, 0, 0);
-		ToastExpander.showFor(toast, 5000);
-
+		findViewById(R.id.progressBar).setVisibility(View.VISIBLE);
 	}
 
 	public void stopLoadAnimation(){
-		if(toast != null){
-			toast.cancel();
-			ToastExpander.stop();
-		}
+		findViewById(R.id.progressBar).setVisibility(View.GONE);
 	}
 	
 	public void copy(String src,String dest){
@@ -280,21 +283,75 @@ public class ImgActivity extends Activity implements OnClickListener, OnItemSele
 			} catch (IOException e) {}
 		}
 	}
-	
-	@Override
-	public void onItemSelected(AdapterView<?> parent, View arg1, int pos,long arg3) {
-		salle = parent.getItemAtPosition(pos).toString();
-		refreshImg();
-	}
 
 	@Override
-	public void onNothingSelected(AdapterView<?> arg0) {
-		// TODO Auto-generated method stub
-		Log.e("nothing","");
+	protected void onResume() {
+		if(refresh_needed){
+			getListeSalles();
+			refresh_needed = false;
+		}
+		
+		super.onResume();
 	}
 	
 	@Override
-	protected void onResume() {
-		super.onResume();
+	public boolean onTouch(View v, MotionEvent event) {
+		ImageView view = (ImageView) v;
+
+		switch (event.getAction() & MotionEvent.ACTION_MASK) {
+		case MotionEvent.ACTION_DOWN:
+			savedMatrix.set(matrix);
+			start.set(event.getX(), event.getY());
+			//Log.d("", "mode=DRAG");
+			mode = DRAG;
+			break;
+		case MotionEvent.ACTION_POINTER_DOWN:
+			oldDist = spacing(event);
+			Log.d("", "oldDist=" + oldDist);
+			if (oldDist > 10f) {
+				savedMatrix.set(matrix);
+				midPoint(mid, event);
+				mode = ZOOM;
+				//Log.d("", "mode=ZOOM");
+			}
+			break;
+		case MotionEvent.ACTION_UP:
+		case MotionEvent.ACTION_POINTER_UP:
+			mode = NONE;
+			//Log.d("", "mode=NONE");
+			break;
+		case MotionEvent.ACTION_MOVE:
+			if (mode == DRAG) {
+				matrix.set(savedMatrix);
+				matrix.postTranslate(event.getX() - start.x, event.getY() - start.y);
+			} else if (mode == ZOOM) {
+				float newDist = spacing(event);
+				//Log.d("", "newDist=" + newDist);
+				if (newDist > 10f) {
+					matrix.set(savedMatrix);
+					float scale = newDist / oldDist;
+					matrix.postScale(scale, scale, mid.x, mid.y);
+				}
+			}
+			break;
+		}
+
+		view.setImageMatrix(matrix);
+		return true;
 	}
+	
+	/** Determine the space between the first two fingers */
+	private float spacing(MotionEvent event) {
+		float x = event.getX(0) - event.getX(1);
+		float y = event.getY(0) - event.getY(1);
+		return FloatMath.sqrt(x * x + y * y);
+	}
+
+	/** Calculate the mid point of the first two fingers */
+	private void midPoint(PointF point, MotionEvent event) {
+		float x = event.getX(0) + event.getX(1);
+		float y = event.getY(0) + event.getY(1);
+		point.set(x / 2, y / 2);
+	}
+
 }
