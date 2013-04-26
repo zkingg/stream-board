@@ -116,7 +116,7 @@ public class Communication{
 		ArrayList<String> list = new ArrayList<String>();
 		try {
 			initSocket();
-			System.out.println("Demande de la des fichiers image par salle et date ,pour la salle"+salle);
+			System.out.println("Demande la liste des fichiers d'image par salle et date ,pour la salle"+salle);
 			String str = ("getListDateImgRoom;"+salle+";"+date);
 			envoi(str);
 			System.out.println("Attente de réponse");
@@ -212,7 +212,7 @@ public class Communication{
 		return list;
 	}
 	
-	private static Bitmap getBitmapFromURL(String src) {
+	public static Bitmap getBitmapFromURL(String src) {
 	    try {
 	        Bitmap myBitmap = BitmapFactory.decodeFile(src);
 	        return myBitmap;
