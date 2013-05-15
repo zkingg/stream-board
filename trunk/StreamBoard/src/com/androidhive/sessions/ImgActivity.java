@@ -22,8 +22,10 @@ import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Environment;
+import android.util.DisplayMetrics;
 import android.util.FloatMath;
 import android.util.Log;
+import android.view.Display;
 import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.Menu;
@@ -205,6 +207,7 @@ public class ImgActivity extends Activity implements  OnTouchListener {
 			
 			@Override
 			protected void onPostExecute(Void result) {
+				resize();
 				stopLoadAnimation();
 			}
 		}.execute();
@@ -322,8 +325,11 @@ public class ImgActivity extends Activity implements  OnTouchListener {
 			break;
 		case MotionEvent.ACTION_MOVE:
 			if (mode == DRAG) {
+				float dx = event.getX() - start.x;
+				float dy = event.getY() - start.y;
+
 				matrix.set(savedMatrix);
-				matrix.postTranslate(event.getX() - start.x, event.getY() - start.y);
+				matrix.postTranslate(dx,dy);
 			} else if (mode == ZOOM) {
 				float newDist = spacing(event);
 				//Log.d("", "newDist=" + newDist);
@@ -352,6 +358,31 @@ public class ImgActivity extends Activity implements  OnTouchListener {
 		float x = event.getX(0) + event.getX(1);
 		float y = event.getY(0) + event.getY(1);
 		point.set(x / 2, y / 2);
+	}
+	
+	private void resize(){
+		Bitmap bmp = Communication.getBitmapFromURL(this.getCacheDir()+"/now.png");
+		
+	    int iWidth=bmp.getWidth();
+        int iHeight=bmp.getHeight();
+
+        Display display = getWindowManager().getDefaultDisplay();
+        DisplayMetrics dm = new DisplayMetrics();
+        display.getMetrics(dm);
+
+        int dWidth=dm.widthPixels;
+        int dHeight=dm.heightPixels;
+
+        float sWidth=((float) dWidth)/iWidth;
+        float sHeight=((float) dHeight)/iHeight;
+
+        if(sWidth>sHeight) sWidth=sHeight;
+        else sHeight=sWidth;
+
+        Matrix matrix=new Matrix();
+        matrix.postScale(sWidth,sHeight);
+        Bitmap newImage=Bitmap.createBitmap(bmp, 0, 0, iWidth, iHeight, matrix, true);
+        image.setImageBitmap(newImage);
 	}
 
 }
