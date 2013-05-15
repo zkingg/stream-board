@@ -266,7 +266,7 @@ public class ImgActivity extends Activity implements  OnTouchListener {
 	public void copy(String src,String dest){
 		FileInputStream in = null;
 		FileOutputStream out =null;
-		try {
+		try { 
 			in = new FileInputStream(new File(src));
 			out = new FileOutputStream(dest);
 			byte buf[] = new byte[1024];
