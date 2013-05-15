@@ -376,8 +376,9 @@ public class ImgActivity extends Activity implements  OnTouchListener {
         float sWidth=((float) dWidth)/iWidth;
         float sHeight=((float) dHeight)/iHeight;
 
+        /* pour garder le ratio
         if(sWidth>sHeight) sWidth=sHeight;
-        else sHeight=sWidth;
+        else sHeight=sWidth;*/
 
         Matrix matrix=new Matrix();
         matrix.postScale(sWidth,sHeight);
