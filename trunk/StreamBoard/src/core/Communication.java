@@ -204,6 +204,7 @@ public class Communication{
 			return list;//si no element return null 
 		}
 		catch( NumberFormatException e ){}
+		catch( ImpossibleConnectionException e){ throw new ImpossibleConnectionException(e.getMessage());}
 		catch(Exception e){
 			e.printStackTrace();
 		}
