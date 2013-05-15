@@ -1,5 +1,3 @@
-<?xml version="1.0" encoding="utf-8"?>
-   
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/RelativeLayout1"
@@ -9,18 +7,13 @@
     android:orientation="horizontal"
     android:screenOrientation="landscape" >
 
-    <!--  
-    <ImageView
-        android:id="@+id/imageView1"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_weight="0.63" />
-	-->
 	
      <ImageView
         android:id="@+id/imageView1"
-       	android:layout_width="match_parent"
-        android:layout_height="wrap_content"
+        android:layout_width="fill_parent"
+        android:layout_height="fill_parent"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentRight="true"
         android:layout_weight="0.63"
         android:scaleType="matrix" />
    

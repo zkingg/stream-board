@@ -45,11 +45,11 @@ public  class GalerieActivity extends Activity  implements OnTouchListener{
 	
 	@Override
     public void onCreate(Bundle savedInstanceState) {
+		getWindow().setFlags(LayoutParams.FLAG_FULLSCREEN,LayoutParams.FLAG_FULLSCREEN);//full screen
+		requestWindowFeature(Window.FEATURE_NO_TITLE);//no titre
+		
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_galerie);
-		
-		//getWindow().setFlags(LayoutParams.FLAG_FULLSCREEN,LayoutParams.FLAG_FULLSCREEN);//full screen
-		//requestWindowFeature(Window.FEATURE_NO_TITLE);//no titre
 		
 		new AsyncTask<Void, Integer, Void>() {
 			@Override
