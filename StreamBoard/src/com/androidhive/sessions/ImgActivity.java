@@ -55,7 +55,7 @@ import core.ImpossibleConnectionException;
 
 public class ImgActivity extends Activity implements  OnTouchListener {
 	private String salle = "0";
-	private ArrayList<String> salles;
+	private ArrayList<String> salles = new ArrayList<String>();
 	private boolean refresh_needed=false;
 	private ImageView image = null;
 	private Toast toast;
@@ -72,6 +72,7 @@ public class ImgActivity extends Activity implements  OnTouchListener {
 	int mode = NONE;
 
 	// Remember some things for zooming
+	PointF prevPoint = new PointF();
 	PointF start = new PointF();
 	PointF mid = new PointF();
 	float oldDist = 1f;
@@ -92,14 +93,14 @@ public class ImgActivity extends Activity implements  OnTouchListener {
 	
 	@Override
 	public boolean onPrepareOptionsMenu(Menu menu) {
-		menu.clear();
+		menu.clear();	
+		menu.add(0,2,0,"Rafraichir");
 		SubMenu s = menu.addSubMenu(0,10,0,"Changer de salle");
 		System.out.println(salles);
 		for(String salle : salles){
 			s.add(salle);
 		}
 		
-		menu.add(0,2,0,"Rafraichir");
 		menu.add(0,3,0,"Sauvegarder");
 		menu.add(0,1,0,"Preference");
 		return true;
@@ -114,6 +115,9 @@ public class ImgActivity extends Activity implements  OnTouchListener {
 			startActivity(i);
 			break;
 		case 2://rafraichir
+			if(salles.size()==0) 
+				getListeSalles();
+			
 			refreshImg();
 			break;
 		case 3://sauvegarder
@@ -155,9 +159,15 @@ public class ImgActivity extends Activity implements  OnTouchListener {
 			
 			@Override
 			protected Void doInBackground(Void... params) {
-				Communication c = new Communication(ImgActivity.this);
-				try {ImgActivity.this.salles = c.getListSalle();}
-				catch (ImpossibleConnectionException e) {publishProgress(-1);}
+				try {
+					Communication c = new Communication(ImgActivity.this);
+					Log.i("","oui1");
+					ImgActivity.this.salles = c.getListSalle();
+					Log.i("","oui2");
+				}catch (ImpossibleConnectionException e) {
+					Log.i("","oui3");
+					publishProgress(-1);
+				}
 				
 				return null;
 			}
@@ -305,6 +315,7 @@ public class ImgActivity extends Activity implements  OnTouchListener {
 		case MotionEvent.ACTION_DOWN:
 			savedMatrix.set(matrix);
 			start.set(event.getX(), event.getY());
+			prevPoint.set(event.getX(), event.getY());
 			//Log.d("", "mode=DRAG");
 			mode = DRAG;
 			break;
@@ -331,33 +342,30 @@ public class ImgActivity extends Activity implements  OnTouchListener {
 				float y = values[matrix.MTRANS_Y];
 				float x_max = x+values[matrix.MSCALE_X]*image.getWidth();
 				float y_max = y+values[matrix.MSCALE_Y]*image.getHeight();
-				float dx = event.getX() - start.x;
-				float dy = event.getY() - start.y;
+				float pdx = event.getX() - prevPoint.x;
+				float pdy = event.getY() - prevPoint.y;
 				
-				Log.i("","x:"+x+", y:"+y);				
-				if(x + dx>1){
-					Log.i("","depassement de bordure gauche, dx:"+dx);
-					dx = 0; 
+				Log.i("","x:"+x+", y:"+y+", ex:"+pdx+", ey:"+pdy );				
+				if(x + pdx>1){//depassement de bordure gauche
+					//Log.i("","depassement de bordure gauche, dx:"+(x + pdx));
+					pdx = 0;
+				}else if(x_max - image.getWidth() + pdx <0){//depassement de bordure droite
+					pdx = 0; 
+					//Log.w("","depassement de bordure droite, dx:"+pdx);
 				}
-				
-				if(y + dy>1){
-					Log.i("","depassement de bordure haute, dy:"+dy);
-					dy = 0; 
+					
+				if(y + pdy>1){//depassement de bordure haute
+					//Log.i("","depassement de bordure haute, dy:"+pdy);
+					pdy = 0;
+				}else if(y_max - image.getHeight() + pdy <0){//depassement de bordure basse
+					pdy = 0;  
+					//Log.w("","depassement de bordure basse,hnorm:"+image.getHeight()+", ymax"+y_max);
 				}
-
-				if(x_max - image.getWidth() + dx <0){
-					Log.w("","depassement de bordure droite, dx:"+dx);
-					dx = 0; 
-				}
-				
-				if(y_max - image.getHeight() + dy <0){
-					Log.w("","depassement de bordure basse, dy:"+dy);
-					dy = 0; 
-				}
-				Log.w("","x_max:"+x_max+", y_max:"+y_max+", x::"+image.getWidth());
-				
-				matrix.set(savedMatrix);
-				matrix.postTranslate(dx,dy);
+				//Log.w("","x_max:"+x_max+", y_max:"+y_max+", x::"+image.getWidth());
+								
+				matrix.postTranslate(pdx,pdy);
+				//matrix.set(savedMatrix);
+				prevPoint.set(event.getX(), event.getY());				
 			} else if (mode == ZOOM) {
 				float newDist = spacing(event);
 				//Log.d("", "newDist=" + newDist);

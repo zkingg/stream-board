@@ -72,7 +72,7 @@ public class MainActivity extends Activity implements OnClickListener{
         // Button logout
         btnLogout = (Button) findViewById(R.id.btnLogout);
         
-        Toast.makeText(getApplicationContext(), "User Login Status: " + session.isLoggedIn(), Toast.LENGTH_LONG).show();
+        //Toast.makeText(getApplicationContext(), "User Login Status: " + session.isLoggedIn(), Toast.LENGTH_LONG).show();
         
         
         /**
