@@ -325,9 +325,37 @@ public class ImgActivity extends Activity implements  OnTouchListener {
 			break;
 		case MotionEvent.ACTION_MOVE:
 			if (mode == DRAG) {
+				float[] values = new float[10];
+				matrix.getValues(values);
+				float x = values[matrix.MTRANS_X];
+				float y = values[matrix.MTRANS_Y];
+				float x_max = x+values[matrix.MSCALE_X]*image.getWidth();
+				float y_max = y+values[matrix.MSCALE_Y]*image.getHeight();
 				float dx = event.getX() - start.x;
 				float dy = event.getY() - start.y;
+				
+				Log.i("","x:"+x+", y:"+y);				
+				if(x + dx>1){
+					Log.i("","depassement de bordure gauche, dx:"+dx);
+					dx = 0; 
+				}
+				
+				if(y + dy>1){
+					Log.i("","depassement de bordure haute, dy:"+dy);
+					dy = 0; 
+				}
 
+				if(x_max - image.getWidth() + dx <0){
+					Log.w("","depassement de bordure droite, dx:"+dx);
+					dx = 0; 
+				}
+				
+				if(y_max - image.getHeight() + dy <0){
+					Log.w("","depassement de bordure basse, dy:"+dy);
+					dy = 0; 
+				}
+				Log.w("","x_max:"+x_max+", y_max:"+y_max+", x::"+image.getWidth());
+				
 				matrix.set(savedMatrix);
 				matrix.postTranslate(dx,dy);
 			} else if (mode == ZOOM) {
@@ -361,29 +389,33 @@ public class ImgActivity extends Activity implements  OnTouchListener {
 	}
 	
 	private void resize(){
-		Bitmap bmp = Communication.getBitmapFromURL(this.getCacheDir()+"/now.png");
-		
-	    int iWidth=bmp.getWidth();
-        int iHeight=bmp.getHeight();
-
-        Display display = getWindowManager().getDefaultDisplay();
-        DisplayMetrics dm = new DisplayMetrics();
-        display.getMetrics(dm);
-
-        int dWidth=dm.widthPixels;
-        int dHeight=dm.heightPixels;
-
-        float sWidth=((float) dWidth)/iWidth;
-        float sHeight=((float) dHeight)/iHeight;
-
-        /* pour garder le ratio
-        if(sWidth>sHeight) sWidth=sHeight;
-        else sHeight=sWidth;*/
-
-        Matrix matrix=new Matrix();
-        matrix.postScale(sWidth,sHeight);
-        Bitmap newImage=Bitmap.createBitmap(bmp, 0, 0, iWidth, iHeight, matrix, true);
-        image.setImageBitmap(newImage);
+		try{
+			Bitmap bmp = Communication.getBitmapFromURL(this.getCacheDir()+"/now.png");
+			
+		    int iWidth=bmp.getWidth();
+	        int iHeight=bmp.getHeight();
+	
+	        Display display = getWindowManager().getDefaultDisplay();
+	        DisplayMetrics dm = new DisplayMetrics();
+	        display.getMetrics(dm);
+	
+	        int dWidth=dm.widthPixels;
+	        int dHeight=dm.heightPixels;
+	
+	        float sWidth=((float) dWidth)/iWidth;
+	        float sHeight=((float) dHeight)/iHeight;
+	
+	        /* pour garder le ratio
+	        if(sWidth>sHeight) sWidth=sHeight;
+	        else sHeight=sWidth;*/
+	
+	        Matrix matrix=new Matrix();
+	        matrix.postScale(sWidth,sHeight);
+	        Bitmap newImage=Bitmap.createBitmap(bmp, 0, 0, iWidth, iHeight, matrix, true);
+	        image.setImageBitmap(newImage);
+		}catch(Exception e){
+			e.printStackTrace();
+		}
 	}
 
 }
