@@ -38,6 +38,14 @@
         android:layout_height="wrap_content"
         android:text="Cours" />
       
+      <!-- Hist
+      <Button
+        android:id="@+id/btnHist"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Hist" />
+       -->
+       
       <!-- Aide-->
       <Button
         android:id="@+id/btnaide"
