@@ -37,6 +37,8 @@ public class MainActivity extends Activity implements OnClickListener{
 		
 	//Button List
 	Button btnList;
+	
+
 		
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -57,6 +59,8 @@ public class MainActivity extends Activity implements OnClickListener{
         btnCours = (Button) findViewById(R.id.btnCours);
         btnCours.setOnClickListener(this);
         
+
+        
         // Button Aide
         btnAide = (Button) findViewById(R.id.btnaide);
         btnAide.setOnClickListener(this);
@@ -64,6 +68,7 @@ public class MainActivity extends Activity implements OnClickListener{
         // Button Web
         btnWeb = (Button) findViewById(R.id.btnweb);
         btnWeb.setOnClickListener(this);
+        
         // Button logout
         btnLogout = (Button) findViewById(R.id.btnLogout);
         
@@ -138,6 +143,7 @@ public void onClick(View v) {
 		this.startActivityForResult(intent4, 1000);	
 		break;
 		
+
 		}
 	}
 	

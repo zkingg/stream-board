@@ -21,14 +21,14 @@ public class HistActivity extends ListActivity {
 	ListView lvListe;
 	Communication c ;
 	ArrayList<String> list;
+	//String date="06-02-2013",salle="AMPHI-D1";
 	String room_name;
 	String date;
-	Bitmap img;
-	
 	@Override
     public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		 setContentView(R.layout.activity_hist);
+		 
 		 list = new ArrayList<String>();
 		
 		 
@@ -46,9 +46,12 @@ public class HistActivity extends ListActivity {
 			protected Void doInBackground(Void... params) {
 				c= new Communication(HistActivity.this);
 				try {
+
 					room_name = HistActivity.this.getIntent().getExtras().getString("room_name");
 					date = HistActivity.this.getIntent().getExtras().getString("list");
 					list = c.getListDateImgRoom(room_name, date);
+
+					System.out.println(list.toString() + " " );
 					
 				} catch (ImpossibleConnectionException e) {
 					publishProgress(-1);

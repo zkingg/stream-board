@@ -8,8 +8,10 @@ import android.graphics.Matrix;
 import android.graphics.PointF;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.util.DisplayMetrics;
 import android.util.FloatMath;
 import android.util.Log;
+import android.view.Display;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.Window;
@@ -20,8 +22,10 @@ import android.widget.ImageView;
 public  class GalerieActivity extends Activity  implements OnTouchListener{
 	
 	
-	Bitmap currentImg;
-	
+		Bitmap currentImg;
+		
+		ImageView img;
+		
 		// These matrices will be used to move and zoom image
 		Matrix matrix = new Matrix();
 		Matrix savedMatrix = new Matrix();
@@ -44,8 +48,8 @@ public  class GalerieActivity extends Activity  implements OnTouchListener{
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_galerie);
 		
-		getWindow().setFlags(LayoutParams.FLAG_FULLSCREEN,LayoutParams.FLAG_FULLSCREEN);//full screen
-		requestWindowFeature(Window.FEATURE_NO_TITLE);//no titre
+		//getWindow().setFlags(LayoutParams.FLAG_FULLSCREEN,LayoutParams.FLAG_FULLSCREEN);//full screen
+		//requestWindowFeature(Window.FEATURE_NO_TITLE);//no titre
 		
 		new AsyncTask<Void, Integer, Void>() {
 			@Override
@@ -66,16 +70,20 @@ public  class GalerieActivity extends Activity  implements OnTouchListener{
 			}
 			
 			protected void onPostExecute(Void result) {
+				
 				if (currentImg != null) {
-					ImageView img = (ImageView)findViewById(R.id.imageView1);
+					img = (ImageView)findViewById(R.id.imageView1);
 					img.setImageBitmap(currentImg);
-					
-					//img.setOnTouchListener(this);
+					resize();
 				}
+				
 			}
 		}.execute();
 		
-	
+		ImageView img = (ImageView)findViewById(R.id.imageView1);
+		img.setImageBitmap(currentImg);
+		
+		img.setOnTouchListener(this);
 		
 		
 	}
@@ -146,5 +154,32 @@ public  class GalerieActivity extends Activity  implements OnTouchListener{
 		point.set(x / 2, y / 2);
 	}
 
+
+	private void resize(){
+		Bitmap bmp = currentImg;
 		
+	    int iWidth=bmp.getWidth();
+        int iHeight=bmp.getHeight();
+
+        Display display = getWindowManager().getDefaultDisplay();
+        DisplayMetrics dm = new DisplayMetrics();
+        display.getMetrics(dm);
+
+        int dWidth=dm.widthPixels;
+        int dHeight=dm.heightPixels;
+
+        float sWidth=((float) dWidth)/iWidth;
+        float sHeight=((float) dHeight)/iHeight;
+
+        /* pour garder le ratio
+        if(sWidth>sHeight) sWidth=sHeight;
+        else sHeight=sWidth;*/
+
+        Matrix matrix=new Matrix();
+        matrix.postScale(sWidth,sHeight);
+        
+        Bitmap newImage=Bitmap.createBitmap(bmp, 0, 0, iWidth, iHeight, matrix, true);
+        img.setImageBitmap(newImage);
+	}
+
 }
