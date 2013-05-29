@@ -335,16 +335,17 @@ public class ImgActivity extends Activity implements  OnTouchListener {
 			//Log.d("", "mode=NONE");
 			break;
 		case MotionEvent.ACTION_MOVE:
+			float[] values = new float[10];
+			matrix.getValues(values);
+			float x = values[matrix.MTRANS_X];
+			float y = values[matrix.MTRANS_Y];
+			float x_max = x+values[matrix.MSCALE_X]*image.getWidth();
+			float y_max = y+values[matrix.MSCALE_Y]*image.getHeight();
+			float x_scale = values[matrix.MSCALE_X];
+			float y_scale = values[matrix.MSCALE_Y];
+			float pdx = event.getX() - prevPoint.x;
+			float pdy = event.getY() - prevPoint.y;
 			if (mode == DRAG) {
-				float[] values = new float[10];
-				matrix.getValues(values);
-				float x = values[matrix.MTRANS_X];
-				float y = values[matrix.MTRANS_Y];
-				float x_max = x+values[matrix.MSCALE_X]*image.getWidth();
-				float y_max = y+values[matrix.MSCALE_Y]*image.getHeight();
-				float pdx = event.getX() - prevPoint.x;
-				float pdy = event.getY() - prevPoint.y;
-				
 				Log.i("","x:"+x+", y:"+y+", ex:"+pdx+", ey:"+pdy );				
 				if(x + pdx>1){//depassement de bordure gauche
 					//Log.i("","depassement de bordure gauche, dx:"+(x + pdx));
@@ -370,9 +371,29 @@ public class ImgActivity extends Activity implements  OnTouchListener {
 				float newDist = spacing(event);
 				//Log.d("", "newDist=" + newDist);
 				if (newDist > 10f) {
+					Matrix m = new Matrix();
+					m.set(savedMatrix);
+					
 					matrix.set(savedMatrix);
 					float scale = newDist / oldDist;
-					matrix.postScale(scale, scale, mid.x, mid.y);
+					m.postScale(scale, scale, mid.x, mid.y);
+					
+					float[] new_values = new float[10];
+					m.getValues(new_values);
+					float new_x = new_values[matrix.MTRANS_X];
+					float new_y = new_values[matrix.MTRANS_Y];
+					float new_x_max = new_x+new_values[matrix.MSCALE_X]*image.getWidth();
+					float new_y_max = new_y+new_values[matrix.MSCALE_Y]*image.getHeight();
+
+					if(new_x >0 || new_y>0 || new_x_max -image.getWidth()<0 || new_y_max -image.getHeight()<0){
+						//matrix.postScale(-scale, -scale,mid.x,mid.y);
+						/*Log.i("x:",""+new_x+", y:"+new_y);
+						Log.i("x_m:",""+new_x_max+", y_m:"+new_y_max);*/
+					}else
+					{
+						matrix.postScale(scale, scale, mid.x, mid.y);
+					}
+					
 				}
 			}
 			break;
